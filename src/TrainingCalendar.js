@@ -1,0 +1,62 @@
+
+import React, { useState, useRef, useEffect } from 'react';
+import FullCalendar from '@fullcalendar/react' ;
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import add from 'date-fns/add'
+import { parseISO, formatISO } from 'date-fns';
+
+export default function TrainingCalendar() {
+
+
+    const [trainingEvents, setTrainingEvents] = useState([]);
+
+    
+    useEffect(() => fetchData(), []);
+
+    const fetchData = () => {
+        fetch('https://customerrest.herokuapp.com/gettrainings')
+            .then(response => response.json())
+            .then(data => setTrainingEvents(data)
+        )
+        
+    }
+
+    function dataTransform(event) 
+        {
+            event.title = event.activity+ " / " + event.customer.lastname +" "+ event.customer.firstname
+            event.start = event.date 
+            console.log(event.date+" Alukperäin")
+            event.end = formatISO(add(new Date(parseISO(event.date)), { minutes: event.duration }))
+            console.log(event.customer.lastname+" "+event.end)
+            return event
+        }
+
+    return (
+        <div>
+        <FullCalendar
+            plugins={[ dayGridPlugin, timeGridPlugin ]}
+            initialView="timeGridWeek"
+            headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                }}
+            eventTimeFormat= {{ hour: "2-digit", minute: "2-digit", hour12: false }}
+            eventDataTransform={dataTransform}
+            eventContent={renderEventContent}
+            events={trainingEvents}
+            />
+        </div>
+      )
+
+    
+    function renderEventContent(eventInfo) {
+        return (
+          <>
+            <b>{eventInfo.timeText}</b>
+            <i>{eventInfo.event.title}</i>
+          </>
+        )
+      }
+}
