@@ -23,12 +23,14 @@ export default function TrainingCalendar() {
     }
 
     function dataTransform(event) 
-        {
-            event.title = event.activity+ " / " + event.customer.lastname +" "+ event.customer.firstname
-            event.start = event.date 
-            console.log(event.date+" Alukperäin")
-            event.end = formatISO(add(new Date(parseISO(event.date)), { minutes: event.duration }))
-            console.log(event.customer.lastname+" "+event.end)
+    {       
+            if(event.customer){
+                event.title = event.activity + " / " + event.customer.lastname + " " + event.customer.firstname
+            }
+            if(event.date){
+                event.start =  event.date
+                event.end = formatISO(add(new Date(parseISO(event.date)), { minutes: event.duration }))
+            }
             return event
         }
 
